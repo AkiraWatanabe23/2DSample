@@ -1,25 +1,25 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Player‚Ìˆ—‚É‚Â‚¢‚Ä‹Lq‚·‚éƒNƒ‰ƒX
+/// Playerã®å‡¦ç†ã«ã¤ã„ã¦è¨˜è¿°ã™ã‚‹ã‚¯ãƒ©ã‚¹
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
-    [Header("PlayerStatusˆê——")]
+    [Header("PlayerStatusä¸€è¦§")]
     [SerializeField] private float _moveSpeed = 1f;
     [SerializeField] private float _jumpPower = 1f;
     [SerializeField] private int _hp = 100;
     [SerializeField] private bool _isGround = false;
 
-    private Rigidbody2D _rb2d = default;
+    private Rigidbody2D _rb = default;
+    private float _input = 0;
 
     private void Start()
     {
-        //ˆÈ‰º‚Ì‘‚«•û‚ÍA‚±‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚ğƒAƒ^ƒbƒ`‚µ‚Ä‚¢‚éƒIƒuƒWƒFƒNƒg‚©‚ç‚µ‚©
-        //æ“¾‚Å‚«‚È‚¢‚½‚ßA’ˆÓ
-        _rb2d = GetComponent<Rigidbody2D>();
+        //ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®å–å¾—
+        _rb = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
@@ -27,12 +27,28 @@ public class PlayerController : MonoBehaviour
         Movement();
     }
 
+    private void FixedUpdate()
+    {
+        //ç‰©ç†æ¼”ç®—ã¯Fixedupdate()ã§è¡Œã†
+        _rb.velocity = new Vector2(_input * _moveSpeed, _rb.velocity.y);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        _isGround = true;
+    }
+
     private void Movement()
     {
-        //TODOFˆÚ“®ˆ—(ƒWƒƒƒ“ƒv)
         var hol = Input.GetAxisRaw("Horizontal");
-        var ver = Input.GetAxisRaw("Vertical");
 
-        _rb2d.velocity = new Vector2(hol, ver) * _moveSpeed;
+        //æ¨ªæ–¹å‘ã®å…¥åŠ›ã‚’åæ˜ 
+        _input = hol;
+
+        if (Input.GetButtonDown("Jump") && _isGround)
+        {
+            _rb.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
+            _isGround = false;
+        }
     }
 }
